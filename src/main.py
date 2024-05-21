@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import re
+import openpyxl
 from openpyxl import Workbook
 from openpyxl.styles import PatternFill, Font, Border, Side
 
@@ -20,6 +21,7 @@ def read_excel_file(file_path):
         first = pd.read_excel(file_path)
         headers_row = first.iloc[[0]]
         headers_row.insert(0, 'Unnamed - 1', '')
+        headers_row.insert(0, 'Unnamed - 2', '')
 
         # Read the Excel files, skipping the first row to avoid duplication
         df = pd.read_excel(file_path, header=1)
@@ -58,8 +60,6 @@ def read_excel_file(file_path):
         # Iterate over the groups and create a DataFrame for each group
         for group_name, group_df in grouped_data:
             if group_name != "Total":
-                # Drop the 'Role Ending' column as it's not needed anymore
-                group_df.drop(columns=['Department'], inplace=True)
                 # Append the DataFrame for the current group to the list
                 grouped_dfs.append([shorten_name(group_name), group_df])
 
@@ -85,6 +85,7 @@ def read_excel_file_for_page_2(file_path):
         first = pd.read_excel(file_path)
         headers_row = first.iloc[[0]]
         headers_row.insert(0, 'Unnamed - 1', '')
+        headers_row.insert(0, 'Unnamed - 2', '')
 
         # Read the Excel files, skipping the first row to avoid duplication
         df = pd.read_excel(file_path, header=1, sheet_name=1)
@@ -123,8 +124,6 @@ def read_excel_file_for_page_2(file_path):
         # Iterate over the groups and create a DataFrame for each group
         for group_name, group_df in grouped_data:
             if group_name != "Total":
-                # Drop the 'Role Ending' column as it's not needed anymore
-                group_df.drop(columns=['Role Ending'], inplace=True)
                 # Append the DataFrame for the current group to the list
                 grouped_dfs.append([shorten_name(group_name), group_df])
 
@@ -206,7 +205,7 @@ def style_excel(ws):
         cell.fill = light_blue_fill
 
     # Apply styles to columns 2-5 from the third row to the end
-    for row in ws.iter_rows(min_row=3, min_col=2, max_col=10):
+    for row in ws.iter_rows(min_row=3, min_col=2, max_col=11):
         for cell in row:
             cell.fill = soft_green_fill
 
@@ -224,6 +223,38 @@ def style_excel(ws):
     for i in range(1, max_row + 1):
         for j in range(1, max_col + 1):
             ws.cell(row=i, column=j).border = thin_border
+
+    # Define color fills
+    mid_blue_fill = PatternFill(start_color="A2C4C9", end_color="A2C4C9", fill_type="solid")
+    light_red_fill = PatternFill(start_color="F4CCCC", end_color="F4CCCC", fill_type="solid")
+    light_orange_fill = PatternFill(start_color="F9CB9C", end_color="F9CB9C", fill_type="solid")
+    light_green_fill = PatternFill(start_color="D9EAD3", end_color="D9EAD3", fill_type="solid")
+    light_yellow_fill = PatternFill(start_color="FFF2CC", end_color="FFF2CC", fill_type="solid")
+    marker_blue_fill = PatternFill(start_color="9FC5E8", end_color="9FC5E8", fill_type="solid")
+    marker_green_fill = PatternFill(start_color="93C47D", end_color="93C47D", fill_type="solid")
+    marker_pink_fill = PatternFill(start_color="EAD1DC", end_color="EAD1DC", fill_type="solid")
+    light_grey_fill = PatternFill(start_color="D3D3D3", end_color="D3D3D3", fill_type="solid")
+
+    # Define column ranges and their respective fills
+    column_fills = {
+        ('L', 'Q'): mid_blue_fill,
+        ('R', 'V'): light_red_fill,
+        ('W', 'Z'): light_grey_fill,
+        ('AA', 'AD'): light_orange_fill,
+        ('AE', 'AJ'): light_green_fill,
+        ('AK', 'AO'): light_yellow_fill,
+        ('AP', 'AY'): marker_blue_fill,
+        ('AZ', 'BE'): marker_green_fill,
+        ('BF', 'BG'): marker_pink_fill
+    }
+
+    # Apply colors to the specified columns in the first row
+    for (start_col, end_col), fill_color in column_fills.items():
+        start_index = openpyxl.utils.column_index_from_string(start_col)
+        end_index = openpyxl.utils.column_index_from_string(end_col)
+        for col in range(start_index, end_index + 1):
+            cell = ws.cell(row=1, column=col)
+            cell.fill = fill_color
 
 
 def main():
