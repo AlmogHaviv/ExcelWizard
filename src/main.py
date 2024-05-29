@@ -31,12 +31,14 @@ def read_excel_file(file_path):
         df.drop(columns=columns_to_drop, inplace=True)
 
         # Add new columns with default values
-        df['Entry Type'] = 'Budget'
+        df['Entry Type'] = 'ACTUAL'
         df['Employee ID'] = None
-        df['Exp Type'] = None
+        df['Exp Type'] = 'Ongoing task'
         df['Jira name'] = None
         df['Employee Name'] = 'Total'
         df['Approved by'] = None
+        df['New project1'] = None
+        df['New project2'] = None
 
         # Reorganize the order of columns
         cols = list(df.columns)
@@ -95,12 +97,14 @@ def read_excel_file_for_page_2(file_path):
         df.drop(columns=columns_to_drop, inplace=True)
 
         # Add new columns with default values
-        df['Entry Type'] = 'Budget'
+        df['Entry Type'] = 'ACTUAL'
         df['Employee ID'] = None
-        df['Exp Type'] = None
+        df['Exp Type'] = 'Ongoing task'
         df['Jira name'] = None
         df['Employee Name'] = 'Total'
         df['Approved by'] = None
+        df['New project1'] = None
+        df['New project2'] = None
 
         # Reorganize the order of columns
         cols = list(df.columns)
@@ -225,27 +229,27 @@ def style_excel(ws):
             ws.cell(row=i, column=j).border = thin_border
 
     # Define color fills
-    mid_blue_fill = PatternFill(start_color="A2C4C9", end_color="A2C4C9", fill_type="solid")
-    light_red_fill = PatternFill(start_color="F4CCCC", end_color="F4CCCC", fill_type="solid")
-    light_orange_fill = PatternFill(start_color="F9CB9C", end_color="F9CB9C", fill_type="solid")
-    light_green_fill = PatternFill(start_color="D9EAD3", end_color="D9EAD3", fill_type="solid")
-    light_yellow_fill = PatternFill(start_color="FFF2CC", end_color="FFF2CC", fill_type="solid")
-    marker_blue_fill = PatternFill(start_color="9FC5E8", end_color="9FC5E8", fill_type="solid")
-    marker_green_fill = PatternFill(start_color="93C47D", end_color="93C47D", fill_type="solid")
-    marker_pink_fill = PatternFill(start_color="EAD1DC", end_color="EAD1DC", fill_type="solid")
-    light_grey_fill = PatternFill(start_color="D3D3D3", end_color="D3D3D3", fill_type="solid")
+    mid_blue_fill = PatternFill(start_color="1F89DF", end_color="1F89DF", fill_type="solid")
+    light_red_fill = PatternFill(start_color="DF761F", end_color="DF761F", fill_type="solid")
+    pale_orange_fill = PatternFill(start_color="F3C68A", end_color="F3C68A", fill_type="solid")
+    pale_blue_fill = PatternFill(start_color="6EEAF3", end_color="6EEAF3", fill_type="solid")
+    light_green_fill = PatternFill(start_color="6EF396", end_color="6EF396", fill_type="solid")
+    pale_yellow_fill = PatternFill(start_color="E9F483", end_color="E9F483", fill_type="solid")
+    marker_blue_fill = PatternFill(start_color="4AB3EE", end_color="4AB3EE", fill_type="solid")
+    marker_green_fill = PatternFill(start_color="55FE33", end_color="55FE33", fill_type="solid")
+    marker_pink_fill = PatternFill(start_color="FC5CE6", end_color="FC5CE6", fill_type="solid")
 
     # Define column ranges and their respective fills
     column_fills = {
         ('L', 'Q'): mid_blue_fill,
-        ('R', 'V'): light_red_fill,
-        ('W', 'Z'): light_grey_fill,
-        ('AA', 'AD'): light_orange_fill,
-        ('AE', 'AJ'): light_green_fill,
-        ('AK', 'AO'): light_yellow_fill,
-        ('AP', 'AY'): marker_blue_fill,
-        ('AZ', 'BE'): marker_green_fill,
-        ('BF', 'BG'): marker_pink_fill
+        ('R', 'Z'): light_red_fill,
+        ('AA', 'AD'): pale_orange_fill,
+        ('AE', 'AI'): pale_blue_fill,
+        ('AJ', 'AO'): light_green_fill,
+        ('AP', 'AY'): pale_yellow_fill,
+        ('AZ', 'BE'): marker_blue_fill,
+        ('BF', 'BF'): marker_green_fill,
+        ('BG', 'BG'): marker_pink_fill
     }
 
     # Apply colors to the specified columns in the first row
