@@ -4,6 +4,7 @@ import re
 import openpyxl
 from openpyxl import Workbook
 from openpyxl.styles import PatternFill, Font, Border, Side
+import utils
 
 
 def read_excel_file(file_path):
@@ -26,6 +27,7 @@ def read_excel_file(file_path):
         # Read the Excel files, skipping the first row to avoid duplication
         df = pd.read_excel(file_path, header=1)
 
+
         # Drop unnecessary columns
         columns_to_drop = ['Department Units', 'M.W.D', 'month', 'Special notes']
         df.drop(columns=columns_to_drop, inplace=True)
@@ -37,8 +39,9 @@ def read_excel_file(file_path):
         df['Jira name'] = None
         df['Employee Name'] = 'Total'
         df['Approved by'] = None
-        df['New project1'] = None
-        df['New project2'] = None
+        df['New Project 1'] = None
+        df['New Project 2'] = None
+
 
         # Reorganize the order of columns
         cols = list(df.columns)
@@ -72,70 +75,7 @@ def read_excel_file(file_path):
         return None
 
 
-def read_excel_file_for_page_2(file_path):
-    """
-    Read data from an Excel file, perform necessary transformations, and prepare the data for further processing.
 
-    Args:
-    - file_path (str): Path to the Excel file.
-
-    Returns:
-    - tuple: A tuple containing a list of DataFrames grouped by role, and the headers row DataFrame.
-    """
-    try:
-        # Read the first row to retrieve headers information
-        first = pd.read_excel(file_path)
-        headers_row = first.iloc[[0]]
-        headers_row.insert(0, 'Unnamed - 1', '')
-        headers_row.insert(0, 'Unnamed - 2', '')
-
-        # Read the Excel files, skipping the first row to avoid duplication
-        df = pd.read_excel(file_path, header=1, sheet_name=1)
-
-        # Drop unnecessary columns
-        columns_to_drop = ['Department Units', 'M.W.D', 'month', 'Special notes']
-        df.drop(columns=columns_to_drop, inplace=True)
-
-        # Add new columns with default values
-        df['Entry Type'] = 'ACTUAL'
-        df['Employee ID'] = None
-        df['Exp Type'] = 'Ongoing task'
-        df['Jira name'] = None
-        df['Employee Name'] = 'Total'
-        df['Approved by'] = None
-        df['New project1'] = None
-        df['New project2'] = None
-
-        # Reorganize the order of columns
-        cols = list(df.columns)
-        cols.insert(0, cols.pop(cols.index('Approved by')))
-        cols.insert(0, cols.pop(cols.index('Exp Type')))
-        cols.insert(0, cols.pop(cols.index('Employee Name')))
-        cols.insert(0, cols.pop(cols.index('Jira name')))
-        cols.insert(0, cols.pop(cols.index('Department')))
-        cols.insert(0, cols.pop(cols.index('Role Ending')))
-        cols.insert(0, cols.pop(cols.index('Exp Type')))
-        cols.insert(0, cols.pop(cols.index('Employee ID')))
-        cols.insert(0, cols.pop(cols.index('Entry Type')))
-        df = df[cols]
-
-        # Group the concatenated DataFrame by 'Department'
-        grouped_data = df.groupby('Role Ending')
-
-        # Initialize a list to store the 6 DataFrames
-        grouped_dfs = []
-
-        # Iterate over the groups and create a DataFrame for each group
-        for group_name, group_df in grouped_data:
-            if group_name != "Total":
-                # Append the DataFrame for the current group to the list
-                grouped_dfs.append([shorten_name(group_name), group_df])
-
-        return grouped_dfs
-
-    except Exception as e:
-        print(f"Error reading Excel file: {e}")
-        return None
 
 
 def manipulate_data(data, first_row, output_directory):
@@ -179,10 +119,6 @@ def manipulate_data(data, first_row, output_directory):
             file_name = f"{output_directory}/{df[0]}_5_24_U.xlsx"
         elif df[0] == "QA":
             file_name = f"{output_directory}/PLM_5_24 QA.xlsx"
-        elif df[0] == "GreenHouseControlled":
-            file_name = f"{output_directory}/GreenHouse_5_24.xlsx"
-        elif df[0] == 'FieldNonControlled':
-            file_name = f"{output_directory}/Non Controlled GreenHouse_5_24.xlsx"
         else:
             file_name = f"{output_directory}/{df[0]}_5_24.xlsx"
 
@@ -266,9 +202,7 @@ def main():
     output_file_path = os.path.abspath("../data/")
     # Step 1: Read input Excel file
     input_data, first_row = read_excel_file(input_file_path)
-    second_page_data = read_excel_file_for_page_2(input_file_path)
-    for df in second_page_data:
-        input_data.append(df)
+    utils.main()
 
     if input_data is None:
         return
