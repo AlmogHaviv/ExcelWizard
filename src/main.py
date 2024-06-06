@@ -5,6 +5,7 @@ import openpyxl
 from openpyxl import Workbook
 from openpyxl.styles import PatternFill, Font, Border, Side
 import utils
+import datetime
 
 
 def read_excel_file(file_path):
@@ -27,7 +28,6 @@ def read_excel_file(file_path):
         # Read the Excel files, skipping the first row to avoid duplication
         df = pd.read_excel(file_path, header=1)
 
-
         # Drop unnecessary columns
         columns_to_drop = ['Department Units', 'M.W.D', 'month', 'Special notes']
         df.drop(columns=columns_to_drop, inplace=True)
@@ -41,7 +41,6 @@ def read_excel_file(file_path):
         df['Approved by'] = None
         df['New Project 1'] = None
         df['New Project 2'] = None
-
 
         # Reorganize the order of columns
         cols = list(df.columns)
@@ -73,9 +72,6 @@ def read_excel_file(file_path):
     except Exception as e:
         print(f"Error reading Excel file: {e}")
         return None
-
-
-
 
 
 def manipulate_data(data, first_row, output_directory):
@@ -114,13 +110,22 @@ def manipulate_data(data, first_row, output_directory):
 
         style_excel(ws)
 
+        # Get the current date and time
+        current_date = datetime.datetime.now()
+
+        # Extract the current month and year
+        current_month = current_date.month
+        current_year = current_date.year
+        if current_month == 1:
+            current_year -= 1
+
         # Define the path for the Excel file
         if df[0] == "PLM" or df[0] == "PlantGrowth":
-            file_name = f"{output_directory}/{df[0]}_5_24_U.xlsx"
+            file_name = f"{output_directory}/{df[0]}_{current_month - 1}_{current_year}_U.xlsx"
         elif df[0] == "QA":
-            file_name = f"{output_directory}/PLM_5_24 QA.xlsx"
+            file_name = f"{output_directory}/PLM_{current_month - 1}_{current_year} QA.xlsx"
         else:
-            file_name = f"{output_directory}/{df[0]}_5_24.xlsx"
+            file_name = f"{output_directory}/{df[0]}_{current_month - 1}_{current_year}.xlsx"
 
         # Save the workbook to an Excel file
         wb.save(file_name)

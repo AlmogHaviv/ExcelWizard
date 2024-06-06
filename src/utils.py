@@ -4,6 +4,7 @@ import re
 import openpyxl
 from openpyxl import Workbook
 from openpyxl.styles import PatternFill, Font, Border, Side
+import datetime
 
 
 def read_excel_file_for_page_2(file_path):
@@ -114,7 +115,6 @@ def style_excel(ws):
     pale_blue_fill = PatternFill(start_color="6EEAF3", end_color="6EEAF3", fill_type="solid")
     light_green_fill = PatternFill(start_color="6EF396", end_color="6EF396", fill_type="solid")
     pale_yellow_fill = PatternFill(start_color="E9F483", end_color="E9F483", fill_type="solid")
-    marker_blue_fill = PatternFill(start_color="4AB3EE", end_color="4AB3EE", fill_type="solid")
     marker_green_fill = PatternFill(start_color="55FE33", end_color="55FE33", fill_type="solid")
     marker_pink_fill = PatternFill(start_color="FC5CE6", end_color="FC5CE6", fill_type="solid")
 
@@ -175,11 +175,20 @@ def manipulate_data(data, first_row, output_directory):
 
         style_excel(ws)
 
+        # Get the current date and time
+        current_date = datetime.datetime.now()
+
+        # get current month
+        current_month = current_date.month
+        current_year = current_date.year
+        if current_month == 1:
+            current_year -= 1
+
         # Define the path for the Excel file
         if df[0] == "GreenHouseControlled":
-            file_name = f"{output_directory}/GreenHouse_5_24.xlsx"
+            file_name = f"{output_directory}/GreenHouse_{current_month - 1}_{current_year}.xlsx"
         elif df[0] == 'FieldNonControlled':
-            file_name = f"{output_directory}/Non Controlled GreenHouse_5_24.xlsx"
+            file_name = f"{output_directory}/Non Controlled GreenHouse_{current_month - 1}_{current_year}.xlsx"
         else:
             file_name = f"{output_directory}/{df[0]}_5_24.xlsx"
 
