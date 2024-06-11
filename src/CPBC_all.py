@@ -194,7 +194,6 @@ def create_full_scale_for_excel(department, df):
 
     # Convert the list of new rows to a DataFrame and concatenate with the template DataFrame
     new_rows_df = pd.DataFrame(new_rows)
-    print(new_rows_df)
     template_df = pd.concat([template_df, new_rows_df], ignore_index=True)
 
     # Path to save the new Excel file
@@ -215,7 +214,7 @@ def create_full_scale_for_excel(department, df):
     # Save the workbook
     wb.save(new_file_path)
 
-    # print(template_df)
+    print(template_df)
 
     return
 
