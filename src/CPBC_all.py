@@ -7,17 +7,17 @@ import shutil
 import datetime
 
 
-def main():
+def main(arg):
     input_path = os.path.join('..', 'data', 'jira_data.xlsx')
-    output_path = ""
 
     # Creates a dict of algo, bi, dev, devops and product with relevant df for each one of them.
     dict_of_dfs = create_df_for_cpbc(input_path)
 
     for department, df in dict_of_dfs.items():
-        print(f"{department} report is in process")
-        create_full_scale_for_excel(department, df)
-        print(f"{department} report is ready")
+        if arg == department:
+            print(f"{department} report is in process")
+            create_full_scale_for_excel(department, df)
+            print(f"{department} report is ready")
 
     print("All the reports are ready")
     return
@@ -72,7 +72,6 @@ def departments_df(df: object):
         # get planned per month
         fte_col = fte_contract[['month', category]]
         fte_col['month'] = pd.to_datetime(fte_col['month'])
-        print(fte_col)
         # Get the list of assignees for the current category
         assignees = worker_config[category].dropna().tolist()
         # Filter df2 based on the assignees list
@@ -94,7 +93,6 @@ def departments_df(df: object):
         pivot_df['month'] = pd.to_datetime(pivot_df['Sprint'])
         # Now, merge the two datasets on the 'month' column
         merged_df = pd.merge(pivot_df, fte_col, on='month', how='left')
-        print(merged_df)
         # Rename the 'Dev' column to 'fte_contract'
         merged_df.rename(columns={category: 'FTE Contract'}, inplace=True)
         merged_df['OH'] = merged_df['FTE Contract'] - merged_df['Total Time Spent']
@@ -125,6 +123,8 @@ def clean_string(input_string):
         return "P85-Syngenta"
     elif "P192 - LAV 321 (Lavie)" == input_string:
         return "P192-LAV 321"
+    elif "P274 - Product- Upkeep ChemPass" in input_string:
+        return "P274 - Product- Upkeep CP "
     # Use regex to remove the content inside parentheses along with the space before it
     cleaned_string = re.sub(r'\s*\(.*?\)', '', input_string)
     return cleaned_string
@@ -171,6 +171,9 @@ def create_full_scale_for_excel(department, df):
 
     columns = template_df.columns.tolist()
 
+    # Create a list to store the new rows
+    new_rows = []
+
     # Iterate over each row of the original DataFrame
     for index, row in df.iterrows():
         # Initialize a dictionary to store values for each row
@@ -186,31 +189,36 @@ def create_full_scale_for_excel(department, df):
                 # If the column doesn't exist, assign NaN
                 row_values[column] = np.nan
 
-        # Append the row values to the new DataFrame
-        template_df = template_df.append(row_values, ignore_index=True)
+        # Append the row values to the list of new rows
+        new_rows.append(row_values)
 
-        # Path to save the new Excel file
-        new_file_path = os.path.join('..', 'data', f'{department_name}_{current_month}_{str(current_year)[2:]}.xlsx')
+    # Convert the list of new rows to a DataFrame and concatenate with the template DataFrame
+    new_rows_df = pd.DataFrame(new_rows)
+    print(new_rows_df)
+    template_df = pd.concat([template_df, new_rows_df], ignore_index=True)
 
-        # Copy the template to a new location
-        shutil.copy(template_path, new_file_path)
+    # Path to save the new Excel file
+    new_file_path = os.path.join('..', 'data', f'{department_name}_{current_month}_{str(current_year)[2:]}.xlsx')
 
-        # Load the workbook and select the active sheet
-        wb = load_workbook(new_file_path)
-        ws = wb.active
+    # Copy the template to a new location
+    shutil.copy(template_path, new_file_path)
 
-        # Write the DataFrame to the Excel sheet starting from the third row
-        for row_index, data_row in template_df.iterrows():
-            for col_index, value in enumerate(data_row):
-                ws.cell(row=row_index + 3, column=col_index + 1, value=value)
+    # Load the workbook and select the active sheet
+    wb = load_workbook(new_file_path)
+    ws = wb.active
 
-        # Save the workbook
-        wb.save(new_file_path)
+    # Write the DataFrame to the Excel sheet starting from the third row
+    for row_index, data_row in template_df.iterrows():
+        for col_index, value in enumerate(data_row):
+            ws.cell(row=row_index + 3, column=col_index + 1, value=value)
 
-    print(template_df)
+    # Save the workbook
+    wb.save(new_file_path)
+
+    # print(template_df)
 
     return
 
 
 if __name__ == "__main__":
-    main()
+    main("Bi")
