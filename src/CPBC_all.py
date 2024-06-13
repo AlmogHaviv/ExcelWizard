@@ -7,8 +7,8 @@ import shutil
 import datetime
 
 
-def main(arg):
-    input_path = os.path.join('..', 'data', 'jira_data.xlsx')
+def main(wd, filename, arg):
+    input_path = os.path.join('..', f'{wd}', f'{filename}')
 
     # Creates a dict of algo, bi, dev, devops and product with relevant df for each one of them.
     dict_of_dfs = create_df_for_cpbc(input_path)
@@ -16,7 +16,7 @@ def main(arg):
     for department, df in dict_of_dfs.items():
         if arg == department:
             print(f"{department} report is in process")
-            create_full_scale_for_excel(department, df)
+            create_full_scale_for_excel(department, df, wd)
             print(f"{department} report is ready")
 
     print("All the reports are ready")
@@ -130,7 +130,7 @@ def clean_string(input_string):
     return cleaned_string
 
 
-def create_full_scale_for_excel(department, df):
+def create_full_scale_for_excel(department, df, wd):
     # Get the current date and time
     current_date = datetime.datetime.now()
 
@@ -159,6 +159,10 @@ def create_full_scale_for_excel(department, df):
     elif department == "Dev":
         department_name = "SoftwareDevelopment"
         df['Department'] = "406 - Software Development"
+        df['Role Ending'] = "T112 - Software Developer"
+    elif department == "DevOps":
+        department_name = "SoftwareDevelopment"
+        df['Department'] = "420 - DevOps"
         df['Role Ending'] = "T112 - Software Developer"
     else:
         df['Department'] = f"{department}"
@@ -197,7 +201,7 @@ def create_full_scale_for_excel(department, df):
     template_df = pd.concat([template_df, new_rows_df], ignore_index=True)
 
     # Path to save the new Excel file
-    new_file_path = os.path.join('..', 'data', f'{department_name}_{current_month}_{str(current_year)[2:]}.xlsx')
+    new_file_path = os.path.join('..', f'{wd}', f'{department_name}_{current_month}_{str(current_year)[2:]}.xlsx')
 
     # Copy the template to a new location
     shutil.copy(template_path, new_file_path)
@@ -220,4 +224,4 @@ def create_full_scale_for_excel(department, df):
 
 
 if __name__ == "__main__":
-    main("Bi")
+    main("data", "jira_data.xlsx", "Bi")

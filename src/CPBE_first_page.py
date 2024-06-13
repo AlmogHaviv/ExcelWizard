@@ -8,6 +8,20 @@ import CPBE_second_page
 import datetime
 
 
+def main(wd, filename):
+    input_file_path = os.path.abspath(f"../{wd}/{filename}")
+    output_file_path = os.path.abspath(f"../{wd}/")
+    # Step 1: Read input Excel file
+    input_data, first_row = read_excel_file(input_file_path)
+    CPBE_second_page.main()
+
+    if input_data is None:
+        return
+
+    # Step 2: excel it
+    manipulate_data(input_data, first_row, output_file_path)
+
+
 # noinspection PyArgumentList
 def read_excel_file(file_path):
     """
@@ -203,19 +217,5 @@ def style_excel(ws):
             cell.fill = fill_color
 
 
-def main():
-    input_file_path = os.path.abspath("../data/Experimental_Project_days_template.xlsx")
-    output_file_path = os.path.abspath("../data/")
-    # Step 1: Read input Excel file
-    input_data, first_row = read_excel_file(input_file_path)
-    CPBE_second_page.main()
-
-    if input_data is None:
-        return
-
-    # Step 2: excel it
-    manipulate_data(input_data, first_row, output_file_path)
-
-
 if __name__ == "__main__":
-    main()
+    main("data", "Experimental_Project_days_template" )
