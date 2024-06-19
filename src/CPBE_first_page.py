@@ -13,7 +13,7 @@ def main(wd, filename):
     output_file_path = os.path.abspath(f"../{wd}/")
     # Step 1: Read input Excel file
     input_data, first_row = read_excel_file(input_file_path)
-    CPBE_second_page.main()
+    CPBE_second_page.main(wd, filename)
 
     if input_data is None:
         return
@@ -218,4 +218,4 @@ def style_excel(ws):
 
 
 if __name__ == "__main__":
-    main("data", "Experimental_Project_days_template" )
+    main("data", "Experimental_Project_days_template")

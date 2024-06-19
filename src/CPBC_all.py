@@ -28,9 +28,19 @@ def create_df_for_cpbc(path):
         # Read the execl file to create a df to work with
         expanded_df = pd.read_excel(path)
 
-        df = expanded_df[['Time Spent', 'Assignee', 'Sprint', 'Custom field (Budget)']]
+        # Identify the Sprint columns
+        sprint_columns = [col for col in expanded_df.columns if 'Sprint' in col]
+
+        # Determine the latest non-null date for each row in the Sprint columns
+        expanded_df['Latest Sprint Date'] = expanded_df[sprint_columns].max(axis=1)
+
+        # fetching the necessary data from the expended df
+        df = expanded_df[['Time Spent', 'Assignee', 'Latest Sprint Date', 'Custom field (Budget)']]
         df['Time Spent (Days)'] = df['Time Spent'] / 3600 / 8
         df.drop(columns=['Time Spent'], inplace=True)
+
+        # rename to keep it same as the cpbc report
+        df.rename(columns={'Latest Sprint Date': 'Sprint'}, inplace=True)
 
         df_by_departments = departments_df(df)
 
@@ -96,9 +106,9 @@ def departments_df(df: object):
         # Rename the 'Dev' column to 'fte_contract'
         merged_df.rename(columns={category: 'FTE Contract'}, inplace=True)
         merged_df['OH'] = merged_df['FTE Contract'] - merged_df['Total Time Spent']
+        merged_df = merged_df.dropna(subset=['OH'])
         merged_df.drop(columns=['month'], inplace=True)
         merged_df.rename(columns={'Sprint': 'Month'}, inplace=True)
-        # Store the filtered DataFrame in the dictionary
         category_dfs[category] = merged_df
 
     return category_dfs
@@ -109,7 +119,7 @@ def clean_string(input_string):
         return "P0 - Vacation / Sickness"
     elif input_string[:6] == "P999 -":
         return "P999 - General2"
-    elif "P999 â" in input_string:
+    elif "P999" in input_string and "(Biomica)" in input_string:
         return "P999 - General4"
     elif "P145-Corteva - IA" in input_string:
         return "P145 - Corteva"
@@ -125,6 +135,16 @@ def clean_string(input_string):
         return "P192-LAV 321"
     elif "P274 - Product- Upkeep ChemPass" in input_string:
         return "P274 - Product- Upkeep CP "
+    elif "P165 - VERB BIOTICS" == input_string:
+        return "P165 - Verb Biotics"
+    elif "P401 - The Kitchen" == input_string:
+        return "P401 - The Kitchen"
+    elif "P403 - Run Generator (on going) - Casterra " == input_string:
+        return "P403 - Casterra RUN Generator"
+    elif "P213 - Breeding general  (Canonic 2023)" == input_string:
+        return "P213 - Breeding general "
+    elif "P285 - Ag Plenus" == input_string:
+        return "P285 - DevOps - CP"
     # Use regex to remove the content inside parentheses along with the space before it
     cleaned_string = re.sub(r'\s*\(.*?\)', '', input_string)
     return cleaned_string
@@ -163,7 +183,7 @@ def create_full_scale_for_excel(department, df, wd):
     elif department == "DevOps":
         department_name = "SoftwareDevelopment"
         df['Department'] = "420 - DevOps"
-        df['Role Ending'] = "T112 - Software Developer"
+        df['Role Ending'] = "T105 - DevOps"
     else:
         df['Department'] = f"{department}"
         df['Role Ending'] = f"{department}"
@@ -199,6 +219,7 @@ def create_full_scale_for_excel(department, df, wd):
     # Convert the list of new rows to a DataFrame and concatenate with the template DataFrame
     new_rows_df = pd.DataFrame(new_rows)
     template_df = pd.concat([template_df, new_rows_df], ignore_index=True)
+    template_df['OH'] = template_df['OH'] - template_df['P0 - Vacation / Sickness']
 
     # Path to save the new Excel file
     new_file_path = os.path.join('..', f'{wd}', f'{department_name}_{current_month}_{str(current_year)[2:]}.xlsx')

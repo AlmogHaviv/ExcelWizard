@@ -198,9 +198,10 @@ def manipulate_data(data, first_row, output_directory):
         print(file_name)
 
 
-def main():
-    input_file_path = os.path.abspath("../data/Experimental_Project_days_template.xlsx")
-    output_file_path = os.path.abspath("../data/")
+def main(wd, filename):
+    input_file_path = os.path.abspath(f"../{wd}/{filename}")
+    output_file_path = os.path.abspath(f"../{wd}/")
+    # Step 1: Read input Excel file
     # Step 1: Read input Excel file
     second_page_data, first_row = read_excel_file_for_page_2(input_file_path)
     if second_page_data is None:
