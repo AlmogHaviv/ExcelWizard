@@ -1,7 +1,6 @@
 # ExcelWizard
 
-ExcelWizard is a Python automation tool designed to transform and manipulate Excel files with ease.
-It is particularly useful for generating specific reports from raw data files.
+ExcelWizard is a Python automation tool designed to transform and manipulate Excel files with ease. It is particularly useful for generating specific reports from raw data files, including CPBC (Cross-Platform Business Center) and CPBE (Cross-Platform Business Excellence) reports.
 
 ## Features
 
@@ -9,7 +8,8 @@ It is particularly useful for generating specific reports from raw data files.
 - Perform data transformation and cleanup
 - Generate new Excel files with processed data
 - Apply custom formatting and styling to Excel sheets
-- Supports generating specific reports for different departments (e.g., CPBC and CPBE reports)
+- Support for generating specific reports for different departments (e.g., CPBC reports for Algo, Bi, Dev, Product, Devops, System Architect, and CPB Directors)
+- Support for generating CPBE reports
 
 ## Installation
 
@@ -18,16 +18,29 @@ It is particularly useful for generating specific reports from raw data files.
    
 ## Usage
 
-if you want to use the CPBE flag:
-   1. Place your input Excel file(s) in the `data` directory under the name 'Experimental_Project_days_template.xlsx'.
-   2. Run the `main.py` script: python main.py -e
-   3. The processed Excel files will be generated in the `data` directory.
-if you want to use the CPBC flag:
-   1. Place your input Excel file(s) in the data directory under the name jira_data.xlsx.
-   2. To generate a CPBC report for a specific department:
-         python main.py -c department_name
-      Replace department_name with the specific department you want the report for (e.g., Algo, Bi, Dev).
-   3. The processed Excel files will be generated in the data directory.
+if you want to use the CPBC script:
+   1. Place your input Excel file(s) in the `data` directory.
+   2. Run the `CPBC_all.py` script with the desired options:
+      Options:
+      - `-all`: Generate reports for all departments
+      - `-product`: Generate Product report
+      - `-devops`: Generate Devops report
+      - `-algo`: Generate Algo report
+      - `-dev`: Generate Dev report
+      - `-bi`: Generate BI report
+      - `-sa`: Generate System Architect report
+      - `-cpb`: Generate CPB Directors report
+      - `-input_file INPUT_FILE`: Specify the input file name
+      - `-wd WORKING_DIRECTORY`: Specify the working directory
+      please notice you have to fullfill -input_file and -wb and one of the other flags, otherwise it will return an error
+
+if you want to use the CPBE script:
+   1. Place your input Excel file(s) in the `data` directory.
+   2. Run the `CPBE_first_page.py` script with the desired options:
+      Options:
+      - `-input_file INPUT_FILE`: Specify the input file name
+      - `-wd WORKING_DIRECTORY`: Specify the working directory
+      please notice you have to fullfill -input_file and -wb, otherwise it will return an error
 
 ## Project Structure
 
@@ -35,7 +48,6 @@ if you want to use the CPBC flag:
 - CPBC_all.py: Script to generate the CPBC report for all departments.
 - data/: Directory where input Excel files should be placed and where output files will be generated.
 - config/: Directory containing configuration files such as worker-names.csv and fte_contract.csv.
-- main.py: Main entry point for the script, parses arguments and triggers report generation.
 - requirements.txt: List of dependencies required for the project.
 
 ## Contributing
