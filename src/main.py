@@ -13,6 +13,8 @@ def setup_arg_parser():
     parser.add_argument('-algo', '--algo_report', action='store_true', help='If entered, return the algo report')
     parser.add_argument('-dev', '--dev_report', action='store_true', help='If entered, return the dev report')
     parser.add_argument('-bi', '--bi_report', action='store_true', help='If entered, return the bi report')
+    parser.add_argument('-sa', '--system_architect_report', action='store_true', help='If entered, return the bi report')
+    parser.add_argument('-cpb', '--CPBDirectors_report', action='store_true', help='If entered, return the bi report')
     parser.add_argument('-e', '--cpbe_report', action='store_true', help='If entered, return the  cpbe report')
     parser.add_argument('-input_file', '--input_file', type=str, help='Input file')
     parser.add_argument('-wd', '--wd', type=str, help='Working directory')
@@ -50,6 +52,12 @@ def main():
         elif args.devops_report:
             print("Generating the Devops report...")
             CPBC_all.main(args.wd, args.input_file, "Devops")
+        elif args.system_architect_report:
+            print("Generating the SystemArchitect report...")
+            CPBC_all.main(args.wd, args.input_file, "SystemArchitect")
+        elif args.CPBDirectors_report:
+            print("Generating the CPBDirectors report...")
+            CPBC_all.main(args.wd, args.input_file, "CPBDirectors")
         else:
             print("please specify the type of report, use -h to know which types there are")
 

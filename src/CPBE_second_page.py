@@ -31,9 +31,9 @@ def read_excel_file_for_page_2(file_path):
         df.drop(columns=columns_to_drop, inplace=True)
 
         # Add new columns with default values
-        df['Entry Type'] = 'ACTUAL'
+        df['Entry Type'] = 'Actual'
         df['Employee ID'] = None
-        df['Exp Type'] = 'Ongoing task'
+        df['Exp Type'] = '951 - Ongoing task'
         df['Jira name'] = None
         df['Employee Name'] = 'Total'
         df['Approved by'] = None
@@ -61,6 +61,8 @@ def read_excel_file_for_page_2(file_path):
 
         # Iterate over the groups and create a DataFrame for each group
         for group_name, group_df in grouped_data:
+            group_df['FTE Contract'] = None
+            group_df['FTE left to Assign'] = None
             if group_name != "Total":
                 # Append the DataFrame for the current group to the list
                 grouped_dfs.append([shorten_name(group_name), group_df])
@@ -78,7 +80,7 @@ def shorten_name(name):
     return "".join(split_string[1:])
 
 
-def style_excel(ws):
+def style_excel_second_page(ws):
     # Define fill and font styles
     light_blue_fill = PatternFill(start_color='CCE5FF', end_color='CCE5FF', fill_type='solid')
     soft_green_fill = PatternFill(start_color='D3EAD3', end_color='D3EAD3', fill_type='solid')
@@ -139,7 +141,7 @@ def style_excel(ws):
             cell.fill = fill_color
 
 
-def manipulate_data(data, first_row, output_directory):
+def manipulate_data_second_page(data, first_row, output_directory):
     """
     Perform data manipulation tasks.
 
@@ -173,7 +175,7 @@ def manipulate_data(data, first_row, output_directory):
         for row in df[1].itertuples(index=False):
             ws.append(list(row))
 
-        style_excel(ws)
+        style_excel_second_page(ws)
 
         # Get the current date and time
         current_date = datetime.datetime.now()
@@ -202,13 +204,12 @@ def main(wd, filename):
     input_file_path = os.path.abspath(f"../{wd}/{filename}")
     output_file_path = os.path.abspath(f"../{wd}/")
     # Step 1: Read input Excel file
-    # Step 1: Read input Excel file
     second_page_data, first_row = read_excel_file_for_page_2(input_file_path)
     if second_page_data is None:
         return
 
     # Step 2: excel it
-    manipulate_data(second_page_data, first_row, output_file_path)
+    manipulate_data_second_page(second_page_data, first_row, output_file_path)
 
 
 if __name__ == "__main__":

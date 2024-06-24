@@ -4,17 +4,78 @@ import re
 import numpy as np
 from openpyxl import load_workbook
 import shutil
-import datetime
+from datetime import datetime
+import argparse
 
 
-def main(wd, filename, arg):
+def setup_arg_parser():
+    """
+    Set up the argument parser.
+    """
+    parser = argparse.ArgumentParser(description='parse for type of report')
+    parser.add_argument('-all', '--all_of_the_reports', action='store_true', help='If entered, return the algo report')
+    parser.add_argument('-product', '--product_report', action='store_true', help='If entered, return the algo report')
+    parser.add_argument('-devops', '--devops_report', action='store_true', help='If entered, return the dev report')
+    parser.add_argument('-algo', '--algo_report', action='store_true', help='If entered, return the algo report')
+    parser.add_argument('-dev', '--dev_report', action='store_true', help='If entered, return the dev report')
+    parser.add_argument('-bi', '--bi_report', action='store_true', help='If entered, return the bi report')
+    parser.add_argument('-sa', '--system_architect_report', action='store_true', help='If entered, return the bi report')
+    parser.add_argument('-cpb', '--CPBDirectors_report', action='store_true', help='If entered, return the bi report')
+    parser.add_argument('-input_file', '--input_file', type=str, help='Input file')
+    parser.add_argument('-wd', '--wd', type=str, help='Working directory')
+    return parser
+
+
+def main():
+    try:
+        """
+        Main logic of the script using parsed arguments.
+        """
+        parser = setup_arg_parser()
+
+        # Parse the arguments
+        args = parser.parse_args()
+
+        # Check which report type was selected and perform corresponding action
+        if args.all_of_the_reports:
+            print("Generating all of the report...")
+            sub_main(args.wd, args.input_file, "all")
+        elif args.bi_report:
+            print("Generating the Bi report...")
+            sub_main(args.wd, args.input_file, "Bi")
+        elif args.dev_report:
+            print("Generating the Dev report...")
+            sub_main(args.wd, args.input_file, "Dev")
+        elif args.algo_report:
+            print("Generating the Algo report...")
+            sub_main(args.wd, args.input_file, "Algo")
+        elif args.product_report:
+            print("Generating the Product report...")
+            sub_main(args.wd, args.input_file, "Product")
+        elif args.devops_report:
+            print("Generating the Devops report...")
+            sub_main(args.wd, args.input_file, "Devops")
+        elif args.system_architect_report:
+            print("Generating the SystemArchitect report...")
+            sub_main(args.wd, args.input_file, "SystemArchitect")
+        elif args.CPBDirectors_report:
+            print("Generating the CPBDirectors report...")
+            sub_main(args.wd, args.input_file, "CPBDirectors")
+        else:
+            print("please specify the type of report, use -h to know which types there are")
+
+    except UnicodeDecodeError as e:
+        print("An exception occurred:", str(e))
+
+
+def sub_main(wd, filename, arg):
     input_path = os.path.join('..', f'{wd}', f'{filename}')
 
     # Creates a dict of algo, bi, dev, devops and product with relevant df for each one of them.
     dict_of_dfs = create_df_for_cpbc(input_path)
 
     for department, df in dict_of_dfs.items():
-        if arg == department:
+        if arg == department or arg == "all":
             print(f"{department} report is in process")
             create_full_scale_for_excel(department, df, wd)
             print(f"{department} report is ready")
@@ -41,6 +102,9 @@ def create_df_for_cpbc(path):
 
         # rename to keep it same as the cpbc report
         df.rename(columns={'Latest Sprint Date': 'Sprint'}, inplace=True)
+
+        # Format the date to 'YYYY-MM'
+        df['Sprint'] = df['Sprint'].dt.strftime('%Y-%m')
 
         df_by_departments = departments_df(df)
 
@@ -130,9 +194,9 @@ def clean_string(input_string):
     elif "P84" in input_string:
         return "p84-New program"
     elif "P85 -Syngenta (Lavie)" == input_string:
-        return "P85-Syngenta"
+        return "P85 - Syngenta"
     elif "P192 - LAV 321 (Lavie)" == input_string:
-        return "P192-LAV 321"
+        return "P192 - LAV 321"
     elif "P274 - Product- Upkeep ChemPass" in input_string:
         return "P274 - Product- Upkeep CP "
     elif "P165 - VERB BIOTICS" == input_string:
@@ -145,14 +209,20 @@ def clean_string(input_string):
         return "P213 - Breeding general "
     elif "P285 - Ag Plenus" == input_string:
         return "P285 - DevOps - CP"
-    # Use regex to remove the content inside parentheses along with the space before it
-    cleaned_string = re.sub(r'\s*\(.*?\)', '', input_string)
+    elif "P275 - Experimental Upkeep (CPB)" == input_string:
+        return "P275 - CPB Upkeep Experimental"
+    else:
+        # Use regex to remove the content inside parentheses along with the space before it
+        cleaned_string = re.sub(r'\s*\(.*?\)', '', input_string)
     return cleaned_string
 
 
 def create_full_scale_for_excel(department, df, wd):
     # Get the current date and time
-    current_date = datetime.datetime.now()
+    current_date = datetime.now()
+
+    # Convert the date column to datetime
+    df['Month'] = pd.to_datetime(df['Month'], format='%Y-%m')
 
     # Extract the current month and year
     current_month = current_date.month
@@ -163,7 +233,7 @@ def create_full_scale_for_excel(department, df, wd):
     department_name = department
     df['Entry Type'] = 'Actual'
     df['Employee ID'] = None
-    df['Exp Type'] = 'Ongoing task'
+    df['Exp Type'] = '951 - Ongoing Task'
     df['Jira name'] = None
     df['Employee Name'] = 'Total'
     df['Approved by'] = 'Ilia Zhidkov'
@@ -180,10 +250,21 @@ def create_full_scale_for_excel(department, df, wd):
         department_name = "SoftwareDevelopment"
         df['Department'] = "406 - Software Development"
         df['Role Ending'] = "T112 - Software Developer"
-    elif department == "DevOps":
-        department_name = "SoftwareDevelopment"
+    elif department == "Devops":
+        department_name = "DevOps"
         df['Department'] = "420 - DevOps"
         df['Role Ending'] = "T105 - DevOps"
+    elif department == "SystemArchitect":
+        department_name = "System architect"
+        df['Department'] = "422 -CPB Directors"
+        df['Role Ending'] = "T115 - System Architect"
+        df['Exp Type'] = '950 - Development Task'
+    elif department == "CPBDirectors":
+        department_name = "CPBDirectors"
+        df['Department'] = "422 -CPB Directors"
+        df['Role Ending'] = "CPB Directors"
+        df['Exp Type'] = '950 - Development Task'
+        df['Approved by'] = "Mark Kapel"
     else:
         df['Department'] = f"{department}"
         df['Role Ending'] = f"{department}"
@@ -222,7 +303,7 @@ def create_full_scale_for_excel(department, df, wd):
     template_df['OH'] = template_df['OH'] - template_df['P0 - Vacation / Sickness']
 
     # Path to save the new Excel file
-    new_file_path = os.path.join('..', f'{wd}', f'{department_name}_{current_month}_{str(current_year)[2:]}.xlsx')
+    new_file_path = os.path.join('..', f'{wd}', f'{department_name}_{current_month - 1}_{str(current_year)[2:]}.xlsx')
 
     # Copy the template to a new location
     shutil.copy(template_path, new_file_path)
@@ -234,7 +315,12 @@ def create_full_scale_for_excel(department, df, wd):
     # Write the DataFrame to the Excel sheet starting from the third row
     for row_index, data_row in template_df.iterrows():
         for col_index, value in enumerate(data_row):
-            ws.cell(row=row_index + 3, column=col_index + 1, value=value)
+            # Check if the value is a timestamp, convert to datetime object
+            if isinstance(value, pd.Timestamp):
+                formatted_date = value.strftime('%Y-%m')
+                ws.cell(row=row_index + 3, column=col_index + 1, value=formatted_date)
+            else:
+                ws.cell(row=row_index + 3, column=col_index + 1, value=value)
 
     # Save the workbook
     wb.save(new_file_path)
@@ -245,4 +331,4 @@ def create_full_scale_for_excel(department, df, wd):
 
 
 if __name__ == "__main__":
-    main("data", "jira_data.xlsx", "Bi")
+    main()
