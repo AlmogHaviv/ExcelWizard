@@ -218,6 +218,7 @@ def clean_string(input_string):
 
 
 def create_full_scale_for_excel(department, df, wd):
+    print(department)
     # Get the current date and time
     current_date = datetime.now()
 
@@ -321,6 +322,15 @@ def create_full_scale_for_excel(department, df, wd):
                 ws.cell(row=row_index + 3, column=col_index + 1, value=formatted_date)
             else:
                 ws.cell(row=row_index + 3, column=col_index + 1, value=value)
+
+    if department == "Bi" and current_date.year == 2024:
+        # Specify the row and column of the cell you want to modify
+        row = 5
+        column = 68
+        new_value = 14.3
+
+        # Modify the cell value
+        ws.cell(row=row, column=column).value = new_value
 
     # Save the workbook
     wb.save(new_file_path)
