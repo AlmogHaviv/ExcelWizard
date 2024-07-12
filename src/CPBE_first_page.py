@@ -73,6 +73,12 @@ def read_excel_file(file_path):
         columns_to_drop = ['Department Units', 'M.W.D', 'month', 'Special notes']
         df.drop(columns=columns_to_drop, inplace=True)
 
+        # Ensure the 'Month' column is in datetime format
+        df['Month'] = pd.to_datetime(df['Month'])
+
+        # Convert to desired format "m-y"
+        df['Month'] = df['Month'].dt.strftime('%m-%Y')
+
         # Add new columns with default values
         df['Entry Type'] = 'Actual'
         df['Employee ID'] = None
@@ -278,6 +284,12 @@ def read_excel_file_for_page_2(file_path):
         df['Approved by'] = None
         df['New Project 1'] = None
         df['New Project 2'] = None
+
+        # Ensure the 'Month' column is in datetime format
+        df['Month'] = pd.to_datetime(df['Month'])
+
+        # Convert to desired format "m-y"
+        df['Month'] = df['Month'].dt.strftime('%m-%Y')
 
         # Reorganize the order of columns
         cols = list(df.columns)
