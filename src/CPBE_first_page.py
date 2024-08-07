@@ -69,8 +69,11 @@ def read_excel_file(file_path):
         # Read the Excel files, skipping the first row to avoid duplication
         df = pd.read_excel(file_path, header=1)
 
+        # Drop the first column by its index
+        df.drop(df.columns[0], axis=1, inplace=True)
+
         # Drop unnecessary columns
-        columns_to_drop = ['Department Units', 'M.W.D', 'month', 'Special notes']
+        columns_to_drop = ['Department Units', 'M.W.D', 'Special notes']
         df.drop(columns=columns_to_drop, inplace=True)
 
         # Ensure the 'Month' column is in datetime format
@@ -270,9 +273,11 @@ def read_excel_file_for_page_2(file_path):
 
         # Read the Excel files, skipping the first row to avoid duplication
         df = pd.read_excel(file_path, header=1, sheet_name=1)
+        # Drop the first column by its index
+        df.drop(df.columns[0], axis=1, inplace=True)
 
         # Drop unnecessary columns
-        columns_to_drop = ['Department Units', 'M.W.D', 'month', 'Special notes', 'Unnamed: 1']
+        columns_to_drop = ['Department Units', 'M.W.D', 'Special notes', 'Unnamed: 1']
         df.drop(columns=columns_to_drop, inplace=True)
 
         # Add new columns with default values
