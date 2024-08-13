@@ -104,7 +104,7 @@ def create_df_for_cpbc(path):
         df.rename(columns={'Latest Sprint Date': 'Sprint'}, inplace=True)
 
         # Format the date to 'YYYY-MM'
-        df['Sprint'] = df['Sprint'].dt.strftime('%Y-%m')
+        df['Sprint'] = df['Sprint'].dt.strftime('%m-%Y')
 
         df_by_departments = departments_df(df)
 
@@ -223,7 +223,7 @@ def create_full_scale_for_excel(department, df, wd):
     current_date = datetime.now()
 
     # Convert the date column to datetime
-    df['Month'] = pd.to_datetime(df['Month'], format='%Y-%m')
+    df['Month'] = pd.to_datetime(df['Month'], format='%m-%Y')
 
     # Extract the current month and year
     current_month = current_date.month
