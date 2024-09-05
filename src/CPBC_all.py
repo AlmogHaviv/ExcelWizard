@@ -211,6 +211,8 @@ def clean_string(input_string):
         return "P285 - DevOps - CP"
     elif "P275 - Experimental Upkeep (CPB)" == input_string:
         return "P275 - CPB Upkeep Experimental"
+    elif "P295 - GCP MIGRATION (CPB)" == input_string:
+        return "P295 - Migration to GCP MB & (maybe GR)"
     else:
         # Use regex to remove the content inside parentheses along with the space before it
         cleaned_string = re.sub(r'\s*\(.*?\)', '', input_string)
